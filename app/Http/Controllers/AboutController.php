@@ -4,34 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\Post;
+use App\Models\User;
+use App\Http\Requests\StoreUserRequest;
 
 class AboutController extends Controller
 {
     public function index(Request $request) {
 
+        \DB::enableQueryLog();
         $q = $request->query("q");
-
         $q = "%$q%";
-
         $page = (int) $request->query("page");
-       
+    
         $off = ($page-1)*3;
        
-
-        $count  =  $users = DB::table('users')->get()->count("id");
+        $count  = User::count();
         $totalPage = ceil($count/3);
-        // DB::table('users')->where("id", "=", 14)->delete();
+    
+        $users = User::select("id", "name", "email")->where("name", "like", $q)->get();
 
-        // DB::table('users')->where("id", "=", 1)
-        // ->insert(
-        //     ["name"=> "Abc xyz", "email"=>"abc6@gmail.com"]
-        // );
-        $users = DB::table('users')->select("id", "name", "email")->where("name", "like", $q)->get();
-
-        // $posts = DB::table('posts')->Join('users', 'posts.user_id', '=', 'users.id')->get();
-        // var_dump($posts);
-        
-        return view("about", ["users"=> $users ]); 
+        return view("about", ["users"=> $users]); 
     }
 
     public function show(string $id) {
@@ -39,8 +32,35 @@ class AboutController extends Controller
 
         return view("show", ["id"=>$id, "name"=> "Nguyen Van A"]);
     }
+    public function destroy(string $id) {
+        User::destroy($id);
+        // var_dump($id);
+        return redirect("/about");
+    }
 
-    public function create(Request $request) {
-        return $request->post(); 
+    public function create(StoreUserRequest $request) {
+        // $request->except('name');
+        // $validated = $request->validated();
+
+        // $validated = $request->safe()->only(['name']);
+        $validated = $request->validated();
+
+        // var_dump($request->safe()->only(['name', 'email']));
+
+
+        // $data = $request->post();
+        // $user = new User;
+        // $user->name = $data["name"]->e;
+        // $user->email = $data["email"];
+        // $user->password = $data["password"];
+        
+        // $user->save();
+        User::create($validated);
+
+        return redirect("/about");
+    }
+
+    public function new(Request $request) {
+         return view("new");
     }
 }

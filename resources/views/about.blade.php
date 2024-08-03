@@ -18,7 +18,8 @@
             </div>
         </div>
     </form>
-    
+    <a href="/new/about" class="btn btn-success">New</a>
+
     
     <table class="table">
         <thead>
@@ -37,7 +38,12 @@
                 <td>{{ $user->email }}</td>
                 <td>
                     <button type="button" class="btn btn-success">Edit</button>
-                    <button type="button" class="btn btn-danger">Delete</button>
+                   
+                    <form action="/about/{{ $user->id }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </td>
             </tr>
         @endforeach
@@ -60,6 +66,10 @@
       </a>
     </li>
   </ul>
+ 
+  @php
+  dd(\DB::getQueryLog());
+@endphp
 </nav>
 </body>
 </html>
