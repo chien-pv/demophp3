@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\User;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Resources\UserResource;
 
 class AboutController extends Controller
 {
@@ -23,8 +24,9 @@ class AboutController extends Controller
         $totalPage = ceil($count/3);
     
         $users = User::select("id", "name", "email")->where("name", "like", $q)->get();
-
-        return view("about", ["users"=> $users]); 
+        $data = UserResource::collection($users);
+        // return view("about", ["users"=> $users]); 
+        return response()->json($data, 400);
     }
 
     public function show(string $id) {
